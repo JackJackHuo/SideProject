@@ -14,34 +14,24 @@ const players = [
   ]
   //// FUNCTIONS /////////////////////////////////////
   function drawWinner (players, prize) {
-    // write your code here
     let drawnIndex = Math.floor(Math.random() * players.length)
-    winner = players[drawnIndex]
-    players.splice(drawnIndex,1)
-    announceMsg (winner, prize)
-    
+    winner = players.splice(drawnIndex,1)[0]
+    announceMsg (winner, prize) 
   }
-  
   function announceMsg (winner, prize) {
-  // 請新增 encodeName 和 encodeEmail 函式進行字串處理
-    //姓名保密
-    function encodeName(name){
-  
-        name = name.slice(0,2) + '*'.repeat(name.length - 2)
-        return name
-    }
-    //email保密
-    function encodeEmail(email){
-      split = email.split('@')
-      halfName = split[0].slice(0,Math.floor(split[0].length / 2))
-      newEmail = halfName + '...@' + split[1] 
-      return newEmail
-    }
-  
     console.log(`${winner.number} | ${encodeName(winner.name)} | ${encodeEmail(winner.email)} | ${prize}`)
   }
-  
-  
+  //姓名保密
+  function encodeName(name){
+    name = name.slice(0,2) + '*'.repeat(name.length - 2)
+    return name
+  }
+  //email保密
+  function encodeEmail(email){
+    split = email.split('@')
+    email = split[0].slice(0,Math.floor(split[0].length / 2)) + '...@' + split[1] 
+    return email
+  }
   // add more functions here
   // 隨機產生彩票號碼
   function ticketNo(){
@@ -72,6 +62,9 @@ const players = [
   players.forEach(function(item){
     item.number = ticketNo()
   })
+  // for (let player of players) {
+  //   player.number = ticketNo()
+  // }
   
   // draw 3 winners and announce the results
   drawWinner(players, '頭獎')
@@ -158,6 +151,4 @@ const players = [
   // result(players,'二獎')
   // result(players,'三獎')
   // restPlayer()
-  
-  
   
