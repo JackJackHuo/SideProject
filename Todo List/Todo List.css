@@ -1,0 +1,16 @@
+body{
+    display:flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    margin-top: 50px;
+}
+#btn{
+    /* display: block; */
+    height: 30px;
+    color:white;
+    background-color: rgb(21,152,172);
+    border-radius: 5px;
+}
+#input{
+    height: 30px;
+}
