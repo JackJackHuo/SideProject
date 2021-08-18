@@ -2,18 +2,27 @@ let Server_URL = 'https://movie-list.alphacamp.io'
 let Index_URL = Server_URL + '/api/v1/movies/'
 let Poster_URL = Server_URL + '/posters/'
 let dataPanel = document.querySelector('#data-panel')
+let searchForm = document.querySelector('#search-form')
+let searchInput = document.querySelector('#search-input')
+let paginator = document.querySelector('#paginator')
+let per_page_number = 12
 
 
 
-let moviesList = []
+
+
+
+// render movie panel
+const moviesList = []
 
 axios.get(Index_URL)
   .then(response => {
     moviesList.push(...response.data.results)
-    renderMovieList(moviesList)
+    renderPaginator(moviesList.length)
+    renderMovieList(getMoviesByPage(1))
   })
 
-function renderMovieList(data){
+function renderMovieList(data) {
   let rawHTML = ''
   for (let item of data) {
     rawHTML += `
@@ -27,7 +36,7 @@ function renderMovieList(data){
           <div class="card-footer text-muted">
             <button type="button" class="btn btn-primary btn-show-movie" data-bs-toggle="modal"
               data-bs-target="#movie-modal" data-id="${item.id}" >More</button>
-            <button type="button" class="btn btn-info btn-show-favorit">+</button>
+            <button type="button" class="btn btn-info btn-show-favorite" data-id="${item.id}">+</button>
           </div>
         </div>
       </div>
@@ -38,29 +47,70 @@ function renderMovieList(data){
 }
 
 dataPanel.addEventListener('click', function onPanelClicked(event) {
-  if (event.target.matches("[class*='btn-show-movie']")) {
-    showMovieModal(event.target.dataset.id)
+  let target = event.target
+  if(target.matches("[class*='btn-show-movie']")) {
+    showMovieModal(+target.dataset.id)
+  }else if(target.matches(".btn-show-favorite")){
+    storeMovie(+target.dataset.id)
   }
 })
 
-function showMovieModal(id){
+//show madal
+function showMovieModal(id) {
   const modalTitle = document.querySelector('#movie-modal-title')
   const modalImage = document.querySelector('#movie-modal-image')
   const modalDate = document.querySelector('#movie-modal-date')
   const modalDescription = document.querySelector('#movie-modal-description')
-
-  axios .get(Index_URL + id)
-        .then(response =>{
-          const data = response.data.results
-          modalTitle.innerText = data.title
-          modalDate.innerText = 'Release date: ' + data.release_date
-          modalDescription.innerText = data.description
-          modalImage.innerHTML = `<img src="${Poster_URL + data.image
-            }" alt="movie-poster" class="img-fluid">`
-        })
+  axios.get(Index_URL + id)
+    .then(response => {
+      const data = response.data.results
+      modalTitle.innerText = data.title
+      modalDate.innerText = 'Release date: ' + data.release_date
+      modalDescription.innerText = data.description
+      modalImage.innerHTML = `<img src="${Poster_URL + data.image
+        }" alt="movie-poster" class="img-fluid">`
+    })
+}
+//store favorite movie
+function storeMovie(id){
+  let favoriteMovieList = JSON.parse(localStorage.getItem('favorite movie')) || []
+  let favoriteMovie = moviesList.find(movie => movie.id === id)
+  if (favoriteMovieList.some(movie => movie.id === id)){
+    return alert('already added')
+  }
+  favoriteMovieList.push(favoriteMovie)
+  localStorage.setItem('favorite movie', JSON.stringify(favoriteMovieList))
 }
 
+//search bar function
+searchForm.addEventListener('submit', function onSearchFormSubmitted(event) {
+  event.preventDefault()
+  let keyWords = searchInput.value.trim().toLowerCase()
+  let filteredArr = moviesList.filter(movie => {
+    return movie.title.toLowerCase().includes(keyWords)
+  })
+  if (filteredArr.length === 0) {
+    alert(`Can Not Find Movie <${keyWords}>`)
+  }
+  renderMovieList(filteredArr)
+})
 
+function renderPaginator(amount){
+  let totalPages = Math.ceil(amount / per_page_number)
+  let rawHTML = ''
+  for(let page = 1 ; page <=  totalPages; page++ ){
+    rawHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${page}">${page}</a></li>`
+  }
+  paginator.innerHTML = rawHTML
+  
+}
 
+function getMoviesByPage(page){
+  let startIndex = (page - 1) * per_page_number
+  return moviesList.slice(startIndex, startIndex + per_page_number) 
+}
 
-
+paginator.addEventListener('click', function onPaginatorClicked(event){
+  if(event.target.tagName !== "A" ) return
+  renderMovieList(getMoviesByPage(+event.target.dataset.page))
+})
