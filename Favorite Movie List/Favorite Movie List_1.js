@@ -8,19 +8,17 @@ let paginator = document.querySelector('#paginator')
 let per_page_number = 12
 
 
-
-
-
-
 // render movie panel
 const moviesList = []
-
+let filteredArr = []
 axios.get(Index_URL)
   .then(response => {
     moviesList.push(...response.data.results)
     renderPaginator(moviesList.length)
+    // renderMovieList(moviesList)
     renderMovieList(getMoviesByPage(1))
   })
+
 
 function renderMovieList(data) {
   let rawHTML = ''
@@ -86,31 +84,33 @@ function storeMovie(id){
 searchForm.addEventListener('submit', function onSearchFormSubmitted(event) {
   event.preventDefault()
   let keyWords = searchInput.value.trim().toLowerCase()
-  let filteredArr = moviesList.filter(movie => {
+  filteredArr = moviesList.filter(movie => {
     return movie.title.toLowerCase().includes(keyWords)
   })
   if (filteredArr.length === 0) {
     alert(`Can Not Find Movie <${keyWords}>`)
   }
-  renderMovieList(filteredArr)
+  renderPaginator(filteredArr.length)
+  renderMovieList(getMoviesByPage(1))
 })
 
+//render paginator by total amount
 function renderPaginator(amount){
   let totalPages = Math.ceil(amount / per_page_number)
-  let rawHTML = ''
+  paginator.innerHTML = ''
   for(let page = 1 ; page <=  totalPages; page++ ){
-    rawHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${page}">${page}</a></li>`
+    paginator.innerHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${page}">${page}</a></li>`
   }
-  paginator.innerHTML = rawHTML
-  
 }
 
 function getMoviesByPage(page){
   let startIndex = (page - 1) * per_page_number
-  return moviesList.slice(startIndex, startIndex + per_page_number) 
+  let data = filteredArr.length ? filteredArr : moviesList
+  return data.slice(startIndex, startIndex + per_page_number) 
 }
 
 paginator.addEventListener('click', function onPaginatorClicked(event){
   if(event.target.tagName !== "A" ) return
   renderMovieList(getMoviesByPage(+event.target.dataset.page))
 })
+
