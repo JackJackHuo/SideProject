@@ -1,0 +1,32 @@
+#user-image{
+  border-radius: 50%;
+  transform: scale(0.9);
+}
+#card{
+  border-radius:15px;
+  box-shadow: 2px 2px 5px 1px rgb(145, 137, 142) inset
+}
+[data-gender='female'] > img{
+  border:pink 5px solid;
+}
+[data-gender='male'] > img{
+  border:rgb(0, 162, 255) 5px solid;
+}
+.icon-clicked{
+  position: absolute;
+  left:10px;
+  top:5px;
+  font-size: 30px;
+  color: red;
+  animation-name: likedicon;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes likedicon{
+   0%   {transform: rotate(0deg);}
+  25%  {transform: rotate(30deg);}
+  50%  {transform: rotate(-30deg);}
+  75%  {transform: rotate(30deg);}
+  100% {transform: rotate(0deg);}
+}
