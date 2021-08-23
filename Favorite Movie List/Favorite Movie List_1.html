@@ -35,38 +35,23 @@
 
   <div class="container mt-5">
     <!-- Search Bar -->
-    <form class="row row-cols-lg-auto g-3  mb-2 align-items-center" id="search-form">
+    <form class="row row-cols-lg-auto g-3 mb-2 justify-content-between align-items-center" id="search-form">
       <div class="col-12">
+        <div class="col">
         <label class="visually-hidden" for="search-input">Search Keyword</label>
         <div class="input-group">
           <input type="text" class="form-control" id="search-input" placeholder="Keyword...">
-        </div>
-      </div>
-      <div class="col-12">
-        <button type="submit" class="btn btn-primary" id="search-submit">Search</button>
-      </div>
-    </form>
-    <!-- Render Movie List -->
-    <div class="row" id="data-panel">
-      <div class="col-sm-2">
-        <div class="mb-2">
-          <div class="card">
-            <img
-              src="https://raw.githubusercontent.com/ALPHACamp/movie-list-api/master/public/posters/80PWnSTkygi3QWWmJ3hrAwqvLnO.jpg"
-              class="card-img-top" alt="Movie Poste">
-            <div class="card-body">
-              <h5 class="card-title">Movie title</h5>
-            </div>
-            <div class="card-footer text-muted">
-              <button type="button" class="btn btn-primary btn-show-movie" data-bs-toggle="modal"
-                data-bs-target="#movie-modal">More</button>
-              <button type="button" class="btn btn-info btn-show-favorit">+</button>
-            </div>
-          </div>
+          <button type="submit" class="btn btn-primary" id="search-submit">Search</button>
         </div>
       </div>
     </div>
-  </div>
+      <div class="col-12">
+        <i class="fa fa-th fa-2x" aria-hidden="true"></i>
+        <i class="fa fa-bars fa-2x" aria-hidden="true"></i>
+      </div>
+    </form>
+    <!-- Render Movie List -->
+    <div class="row" id="data-panel"></div>
   <!-- Modal -->
   <div class="modal fade" id="movie-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
