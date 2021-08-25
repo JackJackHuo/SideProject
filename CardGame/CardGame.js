@@ -75,7 +75,25 @@ const view = {
     cards.map(card =>{
       card.classList.add('paired')
     })
-  }
+  },
+  renderScore(score) {
+    document.querySelector(".score").innerHTML = `Score: ${score}`;
+  },
+
+  renderTriedTimes(times) {
+    document.querySelector(".tried").innerHTML = `You've tried: ${times} times`;
+  },
+  appendWrongAnimation(...cards){
+    cards.map(card => {
+      card.classList.add('wrong')
+      card.addEventListener('animationend', event => {
+        // console.log(event.target)
+        // console.log(this)
+        // this.classList.remove('wrong')
+        event.target.classList.remove('wrong')
+    })
+  })
+}
 }
 const model = {
   revealCards: [],
@@ -103,17 +121,19 @@ const controller = {
 
       
       case GAME_STATE.SecondCardAwaits:
+        view.renderTriedTimes(++model.triedTimes)
         view.flipCards(card)
         model.revealCards.push(card)
         if (model.isRevealedCardsMatched()){
           this.currentState = GAME_STATE.CardsMatched
-          view.score += 10
+          view.renderScore(model.score+=10)
           view.pairCards(...model.revealCards)
           model.revealCards = []
           this.currentSTATE = GAME_STATE.FirstCardAwaits
         }else{
           this.currentState = GAME_STATE.CardsMatchFailed
-          setTimeout(this.resetCard, 2000);      
+          view.appendWrongAnimation(...model.revealCards)
+          setTimeout(this.resetCard, 1000);             
         }
 
       break
@@ -152,5 +172,5 @@ controller.generateCards()
 document.querySelectorAll('.card-primary').forEach(card => card.addEventListener('click', cardClicked = event =>{
   
   controller.dispatchCardAction(card)
-  // card.classList.toggle('back')
+  // view.appendWrongAnimation(card)
 }))
