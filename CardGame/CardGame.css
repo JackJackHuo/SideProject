@@ -13,6 +13,7 @@
 .card-primary{
   /* 100 / 13 = 7... */
   flex:7% 1 1;
+  /* basis-width flex-grow flex-shrink */
   height: 10vw;
   border: 2px solid #e0e0e0;
   margin: 2px; /* 卡片邊距 */
