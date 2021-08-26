@@ -12,22 +12,22 @@ const Symbols = [
   'https://image.flaticon.com/icons/svg/105/105219.svg'
 ]
 const utility = {
-  shuffleArr(arr) {
+  shuffleArr(count) {
+    const arr = Array.from(Array(count).keys())
     const randomArr = []
     while (arr.length > 0) {
       const randomSelect = Math.floor(Math.random() * arr.length)
-      const randomIndex = arr.splice(randomSelect, 1)
-      randomArr.push(randomIndex[0])
+      randomArr.push(arr.splice(randomSelect, 1))
     }
     return randomArr
   },
   getRandomNumberArray(count) {
-    const number = Array.from(Array(count).keys())
-    for (let index = number.length - 1; index > 0; index--) {
-      let randomIndex = Math.floor(Math.random() * (index + 1)); //;不可省略
-      [number[index], number[randomIndex]] = [number[randomIndex], number[index]]
+    const arr = Array.from(Array(count).keys())
+    for (let index = arr.length - 1; index > 0; index--) {
+      let randomIndex = Math.floor(Math.random() * (index + 1)); //不可省略';' Math.floor(Math.random() * n)[...]
+      [arr[index], arr[randomIndex]] = [arr[randomIndex], arr[index]]
     }
-    return number
+    return arr
   }
 }
 const view = {
@@ -35,7 +35,6 @@ const view = {
   displayCards(cardArr) {
     const rootElement = document.querySelector('#cards')
     rootElement.innerHTML = cardArr.map(index => this.getCardElement(index)).join('')
-    // rootElement.innerHTML = this.shuffleArr(Array.from(Array(52).keys())).map(index => this.getCardElement(index)).join('')
   },
   getCardElement(index) {
     return `
@@ -91,76 +90,74 @@ const view = {
         // console.log(this)
         // this.classList.remove('wrong')
         event.target.classList.remove('wrong')
+      })
     })
-  })
-}
+  },
+  showGameFinished(){
+    const div = document.createElement('div')
+    div.classList.add('completed')
+    div.innerHTML = `
+      <p>Complete!</p>
+      <p>Score: ${model.score}</p>
+      <p>You've tried: ${model.triedTimes} times</p>
+    `
+    const header = document.querySelector('#header')
+    header.before(div)
+  }
 }
 const model = {
   revealCards: [],
   isRevealedCardsMatched(){
-    return model.revealCards[0].dataset.index % 13 === model.revealCards[1].dataset.index % 13
+    return this.revealCards[0].dataset.index % 13 === this.revealCards[1].dataset.index % 13
   },
-  score: 0,
+  score: 250,
   triedTimes: 0
 }
 
 const controller = {
   currentSTATE: GAME_STATE.FirstCardAwaits,
   generateCards(){
+    // view.displayCards(utility.shuffleArr(52))
     view.displayCards(utility.getRandomNumberArray(52))
   } ,
   dispatchCardAction(card){
     if(!card.classList.contains('back')) return
 
     switch(this.currentSTATE){
+
       case GAME_STATE.FirstCardAwaits:
         view.flipCards(card)
         model.revealCards.push(card)
         this.currentSTATE = GAME_STATE.SecondCardAwaits
-      break
+      break    
 
-      
       case GAME_STATE.SecondCardAwaits:
         view.renderTriedTimes(++model.triedTimes)
         view.flipCards(card)
         model.revealCards.push(card)
+
         if (model.isRevealedCardsMatched()){
           this.currentState = GAME_STATE.CardsMatched
           view.renderScore(model.score+=10)
           view.pairCards(...model.revealCards)
           model.revealCards = []
+
+          if(model.score === 260){
+            this.currentSTATE = GAME_STATE.GameFinished
+            view.showGameFinished()
+            return
+          }
           this.currentSTATE = GAME_STATE.FirstCardAwaits
+
         }else{
           this.currentState = GAME_STATE.CardsMatchFailed
           view.appendWrongAnimation(...model.revealCards)
           setTimeout(this.resetCard, 1000);             
         }
-
-      break
-      // case GAME_STATE.CardsMatched:
-      //   model.score+=10
-      //   console.log(model.score)
-      //   if(model.score === 260){
-      //     this.currentSTATE = GAME_STATE.GameFinished
-      //   }else{
-      //     this.currentSTATE = GAME_STATE.FirstCardAwaits
-      //   }
-      // break
-      // case GAME_STATE.CardsMatchFailed:
-      //   setInterval(() => { 
-      //     document.querySelector(`[data-index = '${model.revealCards[0]}']`).classList.add('back')
-      //     document.querySelector(`[data-index = '${model.revealCards[1]}']`).classList.add('back')
-      //     model.revealCards = []
-      //   }, 3000);
-      // break
-      // case GAME_STATE.GameFinished:
-      //   console.log('finished')
-        
+      break       
     }
-    console.log('current state', this.currentSTATE)
-    console.log('revealCard', model.revealCards)
   },
-  resetCard() {
+  resetCard(){
     view.flipCards(...model.revealCards)
     model.revealCards = []
     controller.currentSTATE = GAME_STATE.FirstCardAwaits
@@ -170,7 +167,7 @@ const controller = {
 controller.generateCards()
 
 document.querySelectorAll('.card-primary').forEach(card => card.addEventListener('click', cardClicked = event =>{
-  
+
   controller.dispatchCardAction(card)
-  // view.appendWrongAnimation(card)
+
 }))
