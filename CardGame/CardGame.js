@@ -122,7 +122,7 @@ const model = {
   isRevealedCardsMatched(){
     return this.revealCards[0].dataset.index % 13 === this.revealCards[1].dataset.index % 13
   },
-  score: 250,
+  score: 0,
   triedTimes: 0
 }
 
